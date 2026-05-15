@@ -17,6 +17,7 @@ add_files -norecurse [list \
     [file join $repo_dir rtl uart_tx.vhd] \
     [file join $repo_dir rtl spi_master.vhd] \
     [file join $repo_dir rtl i2c_master.vhd] \
+    [file join $repo_dir rtl moving_avg.vhd] \
     [file join $repo_dir rtl command_read.vhd] \
     [file join $repo_dir rtl data_xmit.vhd] \
     [file join $repo_dir rtl adxl362_wrapper.vhd] \

@@ -13,3 +13,5 @@ set_property -dict { PACKAGE_PIN D4    IOSTANDARD LVCMOS33 } [get_ports { uart_t
 
 set_property -dict { PACKAGE_PIN C14   IOSTANDARD LVCMOS33 } [get_ports { scl_io }]; #IO_L1N_T0_AD0N_15 Sch=tmp_scl
 set_property -dict { PACKAGE_PIN C15   IOSTANDARD LVCMOS33 } [get_ports { sda_io }]; #IO_L12N_T1_MRCC_15 Sch=tmp_sda
+
+set_property -dict { PACKAGE_PIN J15   IOSTANDARD LVCMOS33 } [get_ports { filt_en }]; #IO_L24N_T3_RS0_15 Sch=sw[0]

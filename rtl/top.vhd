@@ -12,6 +12,7 @@ c_baud      : integer := 115_200
 port (
 clk         : in std_logic;
 rstn        : in std_logic;
+filt_en     : in std_logic;
 uart_rx_i   : in std_logic;
 uart_tx_o   : out std_logic;
 cs_o 		: out std_logic;
@@ -29,9 +30,21 @@ signal start        : std_logic := '0';
 signal stop         : std_logic := '0';
 signal acc_valid    : std_logic := '0';
 signal temp         : std_logic_vector (12 downto 0) := ZEROS(13);
-signal accx         : t_byte := ZEROS(16);
-signal accy         : t_byte := ZEROS(16);
-signal accz         : t_byte := ZEROS(16);
+signal accx         : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accy         : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accz         : std_logic_vector (15 downto 0) := ZEROS(16);
+
+signal accx_filt    : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accy_filt    : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accz_filt    : std_logic_vector (15 downto 0) := ZEROS(16);
+signal temp_filt    : std_logic_vector (12 downto 0) := ZEROS(13);
+
+signal accx_mux     : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accy_mux     : std_logic_vector (15 downto 0) := ZEROS(16);
+signal accz_mux     : std_logic_vector (15 downto 0) := ZEROS(16);
+signal temp_mux     : std_logic_vector (12 downto 0) := ZEROS(13);
+
+signal temp_valid   : std_logic := '0';
 
 begin
 
@@ -46,7 +59,7 @@ rstn            => rstn ,
 start_temp_i    => start,
 stop_temp_i     => stop ,
 temp_o          => temp,
-temp_valid_o    => open,
+temp_valid_o    => temp_valid,
 sda_io          => sda_io,
 scl_io          => scl_io
 );
@@ -86,6 +99,63 @@ start_o => start,
 stop_o  => stop
 );
 
+i_moving_avg_accx : entity work.moving_avg
+generic map (
+c_width     => 16,
+c_log2m     => 4
+)
+port map (
+clk     => clk,
+rstn    => rstn,
+data_i  => accx,
+valid_i => acc_valid,
+data_o  => accx_filt
+);
+
+i_moving_avg_accy : entity work.moving_avg
+generic map (
+c_width     => 16,
+c_log2m     => 4
+)
+port map (
+clk     => clk,
+rstn    => rstn,
+data_i  => accy,
+valid_i => acc_valid,
+data_o  => accy_filt
+);
+
+i_moving_avg_accz : entity work.moving_avg
+generic map (
+c_width     => 16,
+c_log2m     => 4
+)
+port map (
+clk     => clk,
+rstn    => rstn,
+data_i  => accz,
+valid_i => acc_valid,
+data_o  => accz_filt
+);
+
+i_moving_avg_temp : entity work.moving_avg
+generic map (
+c_width     => 13,
+c_log2m     => 4
+)
+port map (
+clk     => clk,
+rstn    => rstn,
+data_i  => temp,
+valid_i => temp_valid,
+data_o  => temp_filt
+);
+
+accx_mux <= accx_filt when filt_en = '1' else accx;
+accy_mux <= accy_filt when filt_en = '1' else accy;
+accz_mux <= accz_filt when filt_en = '1' else accz;
+temp_mux <= temp_filt when filt_en = '1' else temp;
+
 i_data_xmit : entity work.data_xmit
 generic map (
 c_clkfreq   => c_clkfreq,
@@ -95,10 +165,10 @@ port map (
 clk         => clk  ,
 rstn        => rstn ,
 tx_o        => uart_tx_o,
-accx_i      => accx,
-accy_i      => accy,
-accz_i      => accz,
-temp_i      => temp,
+accx_i      => accx_mux,
+accy_i      => accy_mux,
+accz_i      => accz_mux,
+temp_i      => temp_mux,
 acc_valid_i => acc_valid
 );
 
