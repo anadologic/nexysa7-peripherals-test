@@ -29,9 +29,9 @@ signal start        : std_logic := '0';
 signal stop         : std_logic := '0';
 signal acc_valid    : std_logic := '0';
 signal temp         : std_logic_vector (12 downto 0) := ZEROS(13);
-signal accx         : t_byte := ZEROS(8);
-signal accy         : t_byte := ZEROS(8);
-signal accz         : t_byte := ZEROS(8);
+signal accx         : t_byte := ZEROS(16);
+signal accy         : t_byte := ZEROS(16);
+signal accz         : t_byte := ZEROS(16);
 
 begin
 

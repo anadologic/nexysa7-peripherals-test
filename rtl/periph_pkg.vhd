@@ -15,6 +15,7 @@ constant c_stop_acc     : t_byte := x"A1";
 -- ADXL362 Register Descriptions
 constant c_power_ctl        : t_byte := x"2D";
 constant c_xdata            : t_byte := x"08";
+constant c_xdata_l          : t_byte := x"0E";
 
 -- ADXL362 Commands
 constant c_meas_mode        : t_byte := x"02";

@@ -14,9 +14,9 @@ clk         : in std_logic;
 rstn        : in std_logic;
 start_acc_i : in std_logic;
 stop_acc_i  : in std_logic;
-accx_o      : out std_logic_vector (7 downto 0);
-accy_o      : out std_logic_vector (7 downto 0);
-accz_o      : out std_logic_vector (7 downto 0);
+accx_o      : out std_logic_vector (15 downto 0);
+accy_o      : out std_logic_vector (15 downto 0);
+accz_o      : out std_logic_vector (15 downto 0);
 acc_valid_o : out std_logic;
 cs_o 		: out std_logic;
 sclk_o 		: out std_logic;
@@ -92,9 +92,9 @@ if rstn = '0' then
     en_spi       <= '0';
     acc_valid_o  <= '0';
     mosi_data    <= ZEROS(8);
-    accx_o       <= ZEROS(8);
-    accy_o       <= ZEROS(8);
-    accz_o       <= ZEROS(8);
+    accx_o       <= ZEROS(16);
+    accy_o       <= ZEROS(16);
+    accz_o       <= ZEROS(16);
 else
     
     case state is
@@ -141,7 +141,7 @@ else
             en_spi 	    <= '1';
             mosi_data	<= c_rd_cmd;	-- read command to ADXL362
             if (data_ready = '1') then
-                mosi_data	<= c_xdata;	-- XDATA register address
+                mosi_data	<= c_xdata_l;	-- XDATA_L register address
                 cntr		<= cntr + 1;
             end if;		
         elsif (cntr = 1) then
@@ -152,16 +152,31 @@ else
         elsif (cntr = 2) then
             if (data_ready = '1') then
                 cntr				<= cntr + 1;
-                accx_o	            <= miso_data;
+                accx_o(7 downto 0)  <= miso_data;
             end if;
         elsif (cntr = 3) then
             if (data_ready = '1') then
                 cntr				<= cntr + 1;
-                accy_o	            <= miso_data;
+                accx_o(15 downto 8) <= miso_data;
             end if;		
         elsif (cntr = 4) then
             if (data_ready = '1') then
-                accz_o(7 downto 0)	<= miso_data;
+                cntr				<= cntr + 1;
+                accy_o(7 downto 0)  <= miso_data;
+            end if;		
+        elsif (cntr = 5) then
+            if (data_ready = '1') then
+                cntr				<= cntr + 1;
+                accy_o(15 downto 8) <= miso_data;
+            end if;		
+        elsif (cntr = 6) then
+            if (data_ready = '1') then
+                cntr				<= cntr + 1;
+                accz_o(7 downto 0)  <= miso_data;
+            end if;		
+        elsif (cntr = 7) then
+            if (data_ready = '1') then
+                accz_o(15 downto 8)	<= miso_data;
                 cntr				<= 0;
                 acc_valid_o			<= '1';
                 en_spi 				<= '0';

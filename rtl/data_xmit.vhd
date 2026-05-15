@@ -11,9 +11,9 @@ port (
 clk         : in std_logic;
 rstn        : in std_logic;
 tx_o        : out std_logic;
-accx_i      : in std_logic_vector (7 downto 0);
-accy_i      : in std_logic_vector (7 downto 0);
-accz_i      : in std_logic_vector (7 downto 0);
+accx_i      : in std_logic_vector (15 downto 0);
+accy_i      : in std_logic_vector (15 downto 0);
+accz_i      : in std_logic_vector (15 downto 0);
 temp_i      : in std_logic_vector (12 downto 0);
 acc_valid_i : in std_logic
 );
@@ -29,7 +29,7 @@ signal cntr         : integer range 0 to 7 := 0;
 signal temp_msb     : t_byte := ZEROS(8);
 signal temp_lsb     : t_byte := ZEROS(8);
 
-signal state : t_state_xmit := (S_IDLE);
+signal state : t_state_xmit := S_IDLE;
 
 begin
 
@@ -56,39 +56,54 @@ if rstn = '0' then
     state       <= S_IDLE;
     cntr        <= 0;
     tx_start    <= '0';
-    din         <= x"00";
+    din         <= ZEROS(8);
 else
     
     case state is 
     when S_IDLE => 
         if (acc_valid_i = '1') then
-            din         <= accx_i;
+            din         <= accx_i(15 downto 8);
             tx_start    <= '1';
             state       <= S_XMIT;
             cntr        <= 0;
         end if;
     when S_XMIT =>
         if (cntr = 0) then 
-            din <= accy_i;
+            din <= accx_i(7 downto 0);
             if (tx_done_tick = '1') then 
                 cntr <= cntr + 1;
             end if;
         elsif (cntr = 1) then 
-            din <= accz_i;
+            din <= accy_i(15 downto 8);
             if (tx_done_tick = '1') then 
                 cntr <= cntr + 1;
             end if;    
         elsif (cntr = 2) then 
+            din <= accy_i(7 downto 0);
+            if (tx_done_tick = '1') then 
+                cntr <= cntr + 1;
+            end if;    
+        elsif (cntr = 3) then 
+            din <= accz_i(15 downto 8);
+            if (tx_done_tick = '1') then 
+                cntr <= cntr + 1;
+            end if;    
+        elsif (cntr = 4) then 
+            din <= accz_i(7 downto 0);
+            if (tx_done_tick = '1') then 
+                cntr <= cntr + 1;
+            end if;    
+        elsif (cntr = 5) then 
             din <= temp_msb;
             if (tx_done_tick = '1') then 
                 cntr <= cntr + 1;
             end if;  
-        elsif (cntr = 3) then 
+        elsif (cntr = 6) then 
             din <= temp_lsb;
             if (tx_done_tick = '1') then 
                 cntr <= cntr + 1;
             end if;                                  
-        elsif (cntr = 4) then 
+        elsif (cntr = 7) then 
             tx_start    <= '0';
             if (tx_done_tick = '1') then 
                 cntr    <= 0;
