@@ -1,0 +1,52 @@
+# Build output
+build/
+
+# Vivado generated files
+*.jou
+*.log
+*.str
+*.backup*
+*.bak
+*.tmp
+
+# Vivado project directories
+vivado/*.cache/
+vivado/*.hw/
+vivado/*.ip_user_files/
+vivado/*.sim/
+vivado/*.runs/
+vivado/*.gen/
+vivado/*.srcs/ip/
+vivado/.Xil/
+.Xil/
+
+# Vivado output products
+*.bit
+*.bin
+*.ltx
+*.mcs
+*.prm
+*.rpt
+*.pb
+*.wdb
+*.wcfg
+*.dcp
+
+# Vivado reports/checkpoints
+*_summary.html
+*_drc.rpx
+*_utilization*.rpt
+*_timing*.rpt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
